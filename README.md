@@ -171,6 +171,11 @@ Consulte [`docs.html`](docs.html) para a documentação técnica completa em for
 
 ---
 
+## Link Notebook
+https://colab.research.google.com/drive/1dKUo2NBoq2TjIflg0EFfNIxtv7V3FASC?usp=sharing
+
+---
+
 ## Tecnologias
 
 - **Python** — Scikit-learn, Pandas, NumPy
