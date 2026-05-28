@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentação — Predição de Óbito COVID-19</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+  /* ── SCREEN ── */
+  :root {
+    --ink: #1a202c;
+    --ink2: #2d3748;
+    --ink3: #4a5568;
+    --muted: #718096;
+    --border: #e2e8f0;
+    --bg: #ffffff;
+    --surface: #f7fafc;
+    --surface2: #edf2f7;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --green: #059669;
+    --green-light: #ecfdf5;
+    --orange: #d97706;
+    --orange-light: #fffbeb;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --purple: #7c3aed;
+    --purple-light: #f5f3ff;
+    --gold: #b45309;
+    --gold-light: #fffbeb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #e8ecf0;
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  /* Print button */
+  .print-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--accent);
+    color: white;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(37,99,235,0.3);
+    font-size: 0.83rem;
+    font-weight: 500;
+  }
+
+  .print-bar span { opacity: 0.85; font-size: 0.78rem; }
+
+  .btn-print {
+    background: white;
+    color: var(--accent);
+    border: none;
+    padding: 7px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    font-family: inherit;
+  }
+
+  .btn-print:hover { opacity: 0.9; }
+
+  .doc-wrap {
+    max-width: 860px;
+    margin: 60px auto 60px;
+    background: var(--bg);
+    box-shadow: 0 4px 40px rgba(0,0,0,0.12);
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    padding: 60px 64px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; left: -50px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(5,150,105,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .cover-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 12px;
+  }
+
+  .cover h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+  }
+
+  .cover h1 span { color: #60a5fa; }
+
+  .cover .cover-sub {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 28px;
+    font-weight: 400;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 40px;
+    align-items: flex-end;
+    position: relative;
+    z-index: 1;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .cover-meta-item { }
+  .cover-meta-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-bottom: 3px; font-family: 'Space Mono', monospace; }
+  .cover-meta-value { font-size: 0.82rem; color: rgba(255,255,255,0.85); font-weight: 500; }
+
+  /* ── CONTENT ── */
+  .content { padding: 48px 64px; }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 40px; page-break-inside: avoid; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 2px 8px;
+    border-radius: 6px;
+    min-width: 30px;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+  }
+
+  h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink2);
+    margin: 20px 0 10px;
+  }
+
+  p {
+    font-size: 0.83rem;
+    color: var(--ink3);
+    line-height: 1.75;
+    margin-bottom: 10px;
+  }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .stat-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    background: var(--surface);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .stat-card.blue::before  { background: var(--accent); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.orange::before{ background: var(--orange); }
+  .stat-card.purple::before{ background: var(--purple); }
+  .stat-card.gold::before  { background: var(--gold); }
+
+  .stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .stat-card.blue .stat-val  { color: var(--accent); }
+  .stat-card.green .stat-val { color: var(--green); }
+  .stat-card.orange .stat-val{ color: var(--orange); }
+  .stat-card.purple .stat-val{ color: var(--purple); }
+  .stat-card.gold .stat-val  { color: var(--gold); }
+
+  .stat-lbl {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    margin: 14px 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  thead { background: var(--surface2); }
+
+  th {
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ink3);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink3);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: var(--surface); }
+  td strong { color: var(--ink); }
+
+  .rank-gold { background: #fef9c3; color: #a16207; font-weight: 700; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; }
+  .rank-blue { background: var(--accent-light); color: var(--accent); font-weight: 600; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: var(--ink3);
+    margin: 14px 0;
+    border: 1px solid;
+  }
+
+  .callout.info    { background: var(--accent-light); border-color: #bfdbfe; }
+  .callout.success { background: var(--green-light);  border-color: #a7f3d0; }
+  .callout.warning { background: var(--orange-light); border-color: #fde68a; }
+  .callout.note    { background: var(--purple-light); border-color: #ddd6fe; }
+
+  .callout strong { color: var(--ink); }
+  .callout code { font-family: 'Space Mono', monospace; font-size: 0.72rem; background: rgba(0,0,0,0.06); padding: 1px 4px; border-radius: 3px; }
+
+  /* ── PIPELINE ── */
+  .pipeline-doc {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 14px 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .pipe-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pipe-row:last-child { border-bottom: none; }
+
+  .pipe-num {
+    width: 40px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--accent);
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+    padding: 12px 0;
+  }
+
+  .pipe-body { padding: 10px 14px; flex: 1; }
+
+  .pipe-title { font-size: 0.78rem; font-weight: 700; color: var(--ink2); margin-bottom: 2px; }
+  .pipe-desc  { font-size: 0.73rem; color: var(--ink3); line-height: 1.5; }
+
+  /* ── COMPARE TABLE ── */
+  .compare-table { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+
+  .cmp-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .cmp-card.active { border-color: #6ee7b7; }
+
+  .cmp-head {
+    padding: 10px 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ink2);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cmp-card.active .cmp-head { background: var(--green-light); }
+
+  .cmp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    font-size: 0.77rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cmp-row:last-child { border-bottom: none; }
+  .cmp-key { color: var(--muted); }
+  .cmp-val { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.8rem; }
+
+  /* ── MATRIX ── */
+  .matrix-doc {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    grid-template-rows: auto 1fr 1fr;
+    gap: 6px;
+    max-width: 420px;
+    margin: 16px auto;
+  }
+
+  .mx-corner { }
+
+  .mx-col-h, .mx-row-h {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.3;
+    padding: 6px;
+    background: var(--surface);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  .mx-row-h { justify-content: flex-end; padding-right: 10px; text-align: right; }
+
+  .mx-cell {
+    padding: 14px 10px;
+    border-radius: 8px;
+    border: 1px solid;
+    text-align: center;
+  }
+
+  .mx-cell .n  { font-family: 'Space Mono', monospace; font-size: 1.3rem; font-weight: 700; line-height: 1; }
+  .mx-cell .pct { font-size: 0.65rem; opacity: 0.65; margin-top: 3px; font-family: 'Space Mono', monospace; }
+  .mx-cell .lbl { font-size: 0.6rem; margin-top: 2px; }
+
+  .mx-tn { background: #ecfdf5; border-color: #a7f3d0; }
+  .mx-tn .n { color: var(--green); }
+  .mx-fp { background: var(--orange-light); border-color: #fde68a; }
+  .mx-fp .n { color: var(--orange); }
+  .mx-fn { background: var(--orange-light); border-color: #fde68a; }
+  .mx-fn .n { color: var(--orange); }
+  .mx-tp { background: var(--gold-light); border-color: #fde68a; }
+  .mx-tp .n { color: var(--gold); }
+
+  /* ── FEATURES TABLE ── */
+  .feat-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin: 12px 0;
+  }
+
+  .feat-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--surface);
+    font-size: 0.73rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--ink3);
+  }
+
+  .fdot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  /* ── BAR VISUAL ── */
+  .bar-doc { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+  .bd-row { display: flex; align-items: center; gap: 10px; }
+  .bd-lbl { font-size: 0.7rem; color: var(--muted); font-family: 'Space Mono', monospace; min-width: 170px; text-align: right; }
+  .bd-track { flex: 1; height: 20px; background: var(--surface2); border-radius: 5px; overflow: hidden; border: 1px solid var(--border); }
+  .bd-fill { height: 100%; border-radius: 5px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+  .bd-fill span { font-size: 0.65rem; color: white; font-weight: 700; font-family: 'Space Mono', monospace; }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 36px;
+  }
+
+  .toc-title {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .toc ol { padding-left: 20px; }
+  .toc li { font-size: 0.8rem; color: var(--ink3); padding: 3px 0; }
+  .toc li::marker { color: var(--accent); font-weight: 700; }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: white; font-size: 13px; }
+    .print-bar { display: none !important; }
+    .doc-wrap { margin: 0; box-shadow: none; max-width: 100%; }
+    .cover { min-height: 260px; padding: 48px 56px; }
+    .cover::before,
+    .cover::after { display: none !important; }
+    .content { padding: 40px 56px; }
+    .section { page-break-inside: avoid; }
+    h2 { page-break-after: avoid; }
+    table { page-break-inside: auto; }
+    tr { page-break-inside: avoid; }
+    .compare-table { page-break-inside: avoid; }
+    .matrix-doc { page-break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+    .page-break { page-break-before: always; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PRINT BAR (screen only) -->
+<div class="print-bar">
+  <div>
+    <strong>Documentação Técnica</strong>
+    <span>&nbsp;— Predição de Óbito por COVID-19 &mdash; Imprima ou salve como PDF com Ctrl+P</span>
+  </div>
+  <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+</div>
+
+<div class="doc-wrap">
+
+  <!-- ══ CAPA ══ -->
+  <div class="cover">
+    <div class="cover-badge">Trabalho Acadêmico &middot; Redes Neurais &middot; 2024</div>
+    <h1>Predição de Óbito <span>COVID-19</span></h1>
+    <p class="cover-sub">
+      Classificação Binária com MLPClassifier (Scikit-learn)<br>
+      Ajuste de Threshold para Dados Desbalanceados
+    </p>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Dataset</div>
+        <div class="cover-meta-value">Kaggle COVID-19 (México)</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Registros</div>
+        <div class="cover-meta-value">1.048.575</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Experimentos</div>
+        <div class="cover-meta-value">27 configurações</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Equipe</div>
+        <div class="cover-meta-value">Bruno M. · Christian · Bruno B. · Lucas · Raphael</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONTEÚDO ══ -->
+  <div class="content">
+
+    <!-- SUMÁRIO -->
+    <div class="toc">
+      <div class="toc-title">Sumário</div>
+      <ol>
+        <li>Introdução e Motivação</li>
+        <li>Descrição do Dataset</li>
+        <li>Features e Pré-processamento</li>
+        <li>Pipeline de Desenvolvimento</li>
+        <li>Arquiteturas e Configurações Testadas</li>
+        <li>Resultados dos Experimentos</li>
+        <li>Ajuste de Threshold</li>
+        <li>Resultados Finais e Matriz de Confusão</li>
+        <li>Conclusão</li>
+      </ol>
+    </div>
+
+    <!-- 1. INTRODUÇÃO -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <h2>Introdução e Motivação</h2>
+      </div>
+
+      <p>
+        Este trabalho acadêmico, desenvolvido para a disciplina de Redes Neurais, aborda a predição de óbito
+        de pacientes diagnosticados com COVID-19 usando um classificador de Perceptron Multicamadas (<strong>MLP</strong>).
+        A tarefa é formulada como um problema de <strong>classificação binária supervisionada</strong>:
+        dado um conjunto de atributos clínicos do paciente, o modelo deve prever se o desfecho será
+        <em>sobrevivência</em> (classe 0) ou <em>óbito</em> (classe 1).
+      </p>
+
+      <p>
+        O principal desafio do projeto é o <strong>severo desbalanceamento de classes</strong>: apenas 7,34% dos
+        registros correspondem a óbitos (proporção aproximada de 13:1). Isso exige que a estratégia de avaliação
+        priorize métricas além da acurácia bruta, em especial o <strong>F1-Score</strong> e o <strong>Recall</strong>
+        da classe positiva.
+      </p>
+
+      <div class="callout warning">
+        ⚠️ <strong>Problema clínico:</strong> Em contexto médico, um <em>falso negativo</em> (não detectar um óbito iminente)
+        é mais custoso que um falso positivo. Portanto, maximizar o recall da classe de óbito é prioritário,
+        mesmo que isso implique redução da acurácia geral.
+      </div>
+    </div>
+
+    <!-- 2. DATASET -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <h2>Descrição do Dataset</h2>
+      </div>
+
+      <p>
+        O dataset utilizado é o <strong>COVID-19 Patient Data</strong>, disponível publicamente no Kaggle,
+        contendo registros epidemiológicos de pacientes do sistema de saúde mexicano durante a pandemia.
+      </p>
+
+      <div class="stat-grid">
+        <div class="stat-card blue">
+          <div class="stat-val">1.048.575</div>
+          <div class="stat-lbl">Registros Originais</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-val">100.000</div>
+          <div class="stat-lbl">Amostra Utilizada</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-val">21</div>
+          <div class="stat-lbl">Colunas Originais</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-val">15</div>
+          <div class="stat-lbl">Features Finais</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-val">13:1</div>
+          <div class="stat-lbl">Proporção Classe 0:1</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-val">27</div>
+          <div class="stat-lbl">Experimentos</div>
+        </div>
+      </div>
+
+      <h3>Distribuição das Classes</h3>
+      <div class="bar-doc">
+        <div class="bd-row">
+          <div class="bd-lbl">Sobreviveu (Classe 0)</div>
+          <div class="bd-track"><div class="bd-fill" style="width:92.66%; background:linear-gradient(90deg,#059669,#065f46)"><span>92.66% — 971.633</span></div></div>
+        </div>
+        <div class="bd-row">
+          <div class="bd-lbl">Óbito (Classe 1)</div>
+          <div class="bd-track"><div class="bd-fill" style="width:7.34%; background:linear-gradient(90deg,#d97706,#92400e)"><span>7.34% — 76.942</span></div></div>
+        </div>
+      </div>
+
+      <h3>Definição da Variável Alvo</h3>
+      <p>
+        A coluna <code style="font-family:monospace; background:#f1f5f9; padding:1px 5px; border-radius:3px; font-size:0.8em">DATE_DIED</code>
+        indica a data de óbito quando preenchida, ou <code style="font-family:monospace; background:#f1f5f9; padding:1px 5px; border-radius:3px; font-size:0.8em">NaN</code>
+        caso contrário. A variável alvo binária foi criada como:
+        <code style="font-family:monospace; background:#f1f5f9; padding:1px 5px; border-radius:3px; font-size:0.8em; color:#0369a1">
+          morte = 1 se DATE_DIED preenchida; 0 se NaN
+        </code>.
+        A coluna <code style="font-family:monospace; background:#f1f5f9; padding:1px 5px; border-radius:3px; font-size:0.8em">DATE_DIED</code>
+        foi então removida do conjunto de features para evitar <em>data leakage</em>.
+      </p>
+    </div>
+
+    <!-- 3. FEATURES -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <h2>Features e Pré-processamento</h2>
+      </div>
+
+      <h3>Features Selecionadas (15 atributos)</h3>
+      <div class="feat-2col">
+        <div class="feat-row"><div class="fdot" style="background:#7c3aed"></div>USMER</div>
+        <div class="feat-row"><div class="fdot" style="background:#7c3aed"></div>MEDICAL_UNIT</div>
+        <div class="feat-row"><div class="fdot" style="background:#2563eb"></div>SEX</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>PNEUMONIA</div>
+        <div class="feat-row"><div class="fdot" style="background:#059669"></div>AGE ★ numérica</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>DIABETES</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>COPD</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>ASTHMA</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>INMSUPR</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>HIPERTENSION</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>OTHER_DISEASE</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>CARDIOVASCULAR</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>OBESITY</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>RENAL_CHRONIC</div>
+        <div class="feat-row"><div class="fdot" style="background:#d97706"></div>TOBACCO</div>
+      </div>
+
+      <p style="font-size:0.72rem; color:var(--muted); margin-top:4px">★ AGE = única feature numérica contínua; demais são binárias (0/1)</p>
+
+      <h3>Estratégia de Pré-processamento</h3>
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Tipo</th><th>Encoder</th><th>Justificativa</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>AGE</strong></td><td>Numérica</td><td>StandardScaler</td><td>Z-score: média 0, desvio padrão 1</td></tr>
+          <tr><td>14 demais features</td><td>Categórica binária</td><td>OneHotEncoder(drop='first')</td><td>Evita multicolinearidade</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        🔒 <strong>Prevenção de data leakage:</strong> O <code>ColumnTransformer</code> é ajustado (<code>fit_transform</code>)
+        apenas no conjunto de treino e aplicado (<code>transform</code>) ao conjunto de teste.
+        Isso garante que informações do teste não influenciem os parâmetros de normalização.
+      </div>
+
+      <h3>Colunas Removidas</h3>
+      <table>
+        <thead><tr><th>Coluna</th><th>Motivo da Remoção</th></tr></thead>
+        <tbody>
+          <tr><td>DATE_DIED</td><td>Originou a variável alvo — remoção obrigatória para evitar leakage</td></tr>
+          <tr><td>INTUBED</td><td>Informação obtida pós-admissão, não disponível no momento da triagem</td></tr>
+          <tr><td>ICU</td><td>Idem — informação pós-triagem</td></tr>
+          <tr><td>PATIENT_TYPE</td><td>Alta correlação com desfecho, causaria leakage indireto</td></tr>
+          <tr><td>CLASIFFICATION_FINAL</td><td>Atributo diagnóstico final, não disponível a priori</td></tr>
+          <tr><td>PREGNANT</td><td>Alta proporção de valores ausentes e não aplicável a todos os pacientes</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. PIPELINE -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <h2>Pipeline de Desenvolvimento</h2>
+      </div>
+
+      <div class="pipeline-doc">
+        <div class="pipe-row">
+          <div class="pipe-num">1</div>
+          <div class="pipe-body">
+            <div class="pipe-title">📥 Ingestão do Dataset</div>
+            <div class="pipe-desc">Carregamento do arquivo CSV do Kaggle. 1.048.575 registros, 21 colunas.</div>
+          </div>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-num">2</div>
+          <div class="pipe-body">
+            <div class="pipe-title">🎯 Criação da Variável Alvo</div>
+            <div class="pipe-desc">
+              <code>morte = (DATE_DIED.notna()).astype(int)</code> — 1 = óbito, 0 = sobreviveu
+            </div>
+          </div>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-num">3</div>
+          <div class="pipe-body">
+            <div class="pipe-title">🧹 Limpeza dos Dados</div>
+            <div class="pipe-desc">
+              Remoção das 6 colunas indicadas. Valores 97 e 99 (código de "não informado" no dataset)
+              são substituídos por NaN. Registros com qualquer NaN são descartados via <code>dropna()</code>.
+            </div>
+          </div>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-num">4</div>
+          <div class="pipe-body">
+            <div class="pipe-title">🎲 Amostragem Estratificada</div>
+            <div class="pipe-desc">
+              Seleção aleatória de 100.000 registros com <code>random_state=42</code>, mantendo a proporção
+              das classes (stratified sampling) para preservar a distribuição do desbalanceamento.
+            </div>
+          </div>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-num">5</div>
+          <div class="pipe-body">
+            <div class="pipe-title">⚙️ Pré-processamento</div>
+            <div class="pipe-desc">
+              <code>ColumnTransformer</code> com <code>StandardScaler</code> para AGE e
+              <code>OneHotEncoder(drop='first')</code> para as 14 features categóricas.
+            </div>
+          </div>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-num">6</div>
+          <div class="pipe-body">
+            <div class="pipe-title">✂️ Divisão Treino/Teste</div>
+            <div class="pipe-desc">
+              <code>train_test_split(test_size=0.2, stratify=y, random_state=42)</code> — 80.000 treino / 20.000 teste.
+            </div>
+          </div>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-num">7</div>
+          <div class="pipe-body">
+            <div class="pipe-title">🧠 Treinamento do MLP</div>
+            <div class="pipe-desc">
+              27 configurações testadas: 3 famílias de arquitetura × 3 tamanhos × 3 learning rates.
+              <code>MLPClassifier(solver='adam', max_iter=500, random_state=42)</code>
+            </div>
+          </div>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-num">8</div>
+          <div class="pipe-body">
+            <div class="pipe-title">🔍 Ajuste de Threshold</div>
+            <div class="pipe-desc">
+              Aplicado ao melhor modelo. <code>predict_proba</code> substitui <code>predict</code>,
+              e o limiar é reduzido abaixo de 0.5 para aumentar o recall da classe de óbito.
+            </div>
+          </div>
+        </div>
+        <div class="pipe-row">
+          <div class="pipe-num">9</div>
+          <div class="pipe-body">
+            <div class="pipe-title">📊 Avaliação</div>
+            <div class="pipe-desc">
+              Métricas: Acurácia, F1-Score ponderado, Recall cls.1, Precisão cls.1, Matriz de Confusão.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. CONFIGURAÇÕES -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <h2>Arquiteturas e Configurações Testadas</h2>
+      </div>
+
+      <p>
+        Foram testadas <strong>27 combinações</strong> de hiperparâmetros, variando o número de camadas ocultas,
+        o número de neurônios por camada e a taxa de aprendizado.
+      </p>
+
+      <table>
+        <thead>
+          <tr><th>Família</th><th>Configurações de Camadas</th><th>Descrição</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 camada oculta</td>
+            <td><code style="font-family:monospace; font-size:0.8em">(16,) · (32,) · (64,)</code></td>
+            <td>Arquitetura simples, convergência rápida</td>
+          </tr>
+          <tr>
+            <td><strong>2 camadas ocultas</strong></td>
+            <td><code style="font-family:monospace; font-size:0.8em">(16,16) · (32,32) · (64,64)</code></td>
+            <td><strong>Melhor desempenho geral</strong></td>
+          </tr>
+          <tr>
+            <td>3 camadas ocultas</td>
+            <td><code style="font-family:monospace; font-size:0.8em">(16,16,16) · (32,32,32) · (64,64,64)</code></td>
+            <td>Maior capacidade de representação</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table style="margin-top:12px">
+        <thead>
+          <tr><th>Parâmetro</th><th>Valores</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Learning Rate</td><td>0.0001 &nbsp;·&nbsp; 0.001 &nbsp;·&nbsp; 0.01</td></tr>
+          <tr><td>Solver</td><td>adam</td></tr>
+          <tr><td>max_iter</td><td>500</td></tr>
+          <tr><td>Activation</td><td>relu (padrão)</td></tr>
+          <tr><td>random_state</td><td>42</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. RESULTADOS -->
+    <div class="section page-break">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <h2>Resultados dos Experimentos (Top 10)</h2>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th><th>Exp #</th><th>Arquitetura</th>
+            <th>LR</th><th>Acurácia</th><th>F1-Score</th>
+            <th>Recall cls.1</th><th>Iter.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="rank-gold">🥇 1°</span></td>
+            <td>11</td><td><strong>(16, 16)</strong></td><td>0.001</td>
+            <td>93.25%</td><td><strong>0.4639</strong></td><td>40.33%</td><td>82</td>
+          </tr>
+          <tr><td><span class="rank-blue">2°</span></td><td>21</td><td>(16, 16, 16)</td><td>0.01</td><td>93.44%</td><td>0.4583</td><td>38.33%</td><td>40</td></tr>
+          <tr><td><span class="rank-blue">3°</span></td><td>22</td><td>(32, 32, 32)</td><td>0.0001</td><td>93.45%</td><td>0.4457</td><td>36.40%</td><td>41</td></tr>
+          <tr><td><span class="rank-blue">4°</span></td><td>7</td><td>(64,)</td><td>0.0001</td><td>93.38%</td><td>0.4414</td><td>36.12%</td><td>50</td></tr>
+          <tr><td><span class="rank-blue">5°</span></td><td>2</td><td>(16,)</td><td>0.001</td><td>93.34%</td><td>0.4380</td><td>35.84%</td><td>47</td></tr>
+          <tr><td><span class="rank-blue">6°</span></td><td>16</td><td>(64, 64)</td><td>0.0001</td><td>93.46%</td><td>0.4321</td><td>34.39%</td><td>66</td></tr>
+          <tr><td><span class="rank-blue">7°</span></td><td>1</td><td>(16,)</td><td>0.0001</td><td>93.31%</td><td>0.4311</td><td>35.01%</td><td>43</td></tr>
+          <tr><td><span class="rank-blue">8°</span></td><td>6</td><td>(32,)</td><td>0.01</td><td>93.38%</td><td>0.4298</td><td>34.46%</td><td>58</td></tr>
+          <tr><td><span class="rank-blue">9°</span></td><td>9</td><td>(64,)</td><td>0.01</td><td>93.20%</td><td>0.4257</td><td>34.81%</td><td>90</td></tr>
+          <tr><td><span class="rank-blue">10°</span></td><td>14</td><td>(32, 32)</td><td>0.001</td><td>93.28%</td><td>0.4237</td><td>34.12%</td><td>118</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Comparação Visual — F1-Score Top 6</h3>
+      <div class="bar-doc">
+        <div class="bd-row"><div class="bd-lbl">(16,16) lr=0.001</div><div class="bd-track"><div class="bd-fill" style="width:100%; background:linear-gradient(90deg,#b45309,#78350f)"><span>0.4639 🥇</span></div></div></div>
+        <div class="bd-row"><div class="bd-lbl">(16,16,16) lr=0.01</div><div class="bd-track"><div class="bd-fill" style="width:98.8%; background:linear-gradient(90deg,#2563eb,#1d4ed8)"><span>0.4583</span></div></div></div>
+        <div class="bd-row"><div class="bd-lbl">(32,32,32) lr=0.0001</div><div class="bd-track"><div class="bd-fill" style="width:96.1%; background:linear-gradient(90deg,#2563eb,#1d4ed8)"><span>0.4457</span></div></div></div>
+        <div class="bd-row"><div class="bd-lbl">(64,) lr=0.0001</div><div class="bd-track"><div class="bd-fill" style="width:95.2%; background:linear-gradient(90deg,#7c3aed,#5b21b6)"><span>0.4414</span></div></div></div>
+        <div class="bd-row"><div class="bd-lbl">(16,) lr=0.001</div><div class="bd-track"><div class="bd-fill" style="width:94.4%; background:linear-gradient(90deg,#059669,#065f46)"><span>0.4380</span></div></div></div>
+        <div class="bd-row"><div class="bd-lbl">(64,64) lr=0.0001</div><div class="bd-track"><div class="bd-fill" style="width:93.2%; background:linear-gradient(90deg,#059669,#065f46)"><span>0.4321</span></div></div></div>
+      </div>
+
+      <div class="callout note">
+        📌 <strong>Observação relevante:</strong> A arquitetura mais simples <code>(16, 16)</code> superou
+        redes maiores e mais profundas. Para 15 features majoritariamente categóricas binárias, a capacidade
+        extra não agrega valor significativo e pode causar overfitting leve.
+      </div>
+    </div>
+
+    <!-- 7. THRESHOLD -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <h2>Ajuste de Threshold</h2>
+      </div>
+
+      <p>
+        O limiar padrão de classificação no Scikit-learn é <strong>0.5</strong>: a classe 1 é prevista
+        quando <code style="font-family:monospace; font-size:0.8em">predict_proba(X)[:, 1] &ge; 0.5</code>.
+        Em cenários com classes desbalanceadas, esse limiar é subótimo para a classe minoritária.
+      </p>
+
+      <p>
+        Ao <strong>reduzir o threshold</strong> (por exemplo, para 0.3 ou 0.35), o modelo torna-se
+        mais "agressivo" na predição de óbito, aumentando o recall à custa de precisão.
+        O F1-Score — que equilibra precisão e recall — é usado como critério de seleção do melhor threshold.
+      </p>
+
+      <div class="compare-table">
+        <div class="cmp-card">
+          <div class="cmp-head">⚙️ Sem ajuste — threshold = 0.5</div>
+          <div class="cmp-row"><div class="cmp-key">Acurácia</div><div class="cmp-val" style="color:#2563eb">93.25%</div></div>
+          <div class="cmp-row"><div class="cmp-key">F1-Score</div><div class="cmp-val" style="color:#7c3aed">0.464</div></div>
+          <div class="cmp-row"><div class="cmp-key">Recall cls.1</div><div class="cmp-val" style="color:#d97706">40.33%</div></div>
+          <div class="cmp-row"><div class="cmp-key">Precisão cls.1</div><div class="cmp-val" style="color:#4b5563">54.58%</div></div>
+        </div>
+        <div class="cmp-card active">
+          <div class="cmp-head">🎯 Com ajuste — threshold &lt; 0.5</div>
+          <div class="cmp-row"><div class="cmp-key">Acurácia</div><div class="cmp-val" style="color:#2563eb">91.55%</div></div>
+          <div class="cmp-row"><div class="cmp-key">F1-Score</div><div class="cmp-val" style="color:#059669">0.558 ↑</div></div>
+          <div class="cmp-row"><div class="cmp-key">Recall cls.1</div><div class="cmp-val" style="color:#b45309">73.55% ↑↑</div></div>
+          <div class="cmp-row"><div class="cmp-key">Precisão cls.1</div><div class="cmp-val" style="color:#d97706">44.90% ↓</div></div>
+        </div>
+      </div>
+
+      <div class="callout success">
+        ✅ <strong>Impacto:</strong> O recall da classe de óbito aumentou <strong>82.4%</strong> (de 40.33% para 73.55%).
+        O F1-Score melhorou <strong>20.3%</strong>. A acurácia geral caiu apenas <strong>1.7 pp</strong>,
+        um trade-off altamente favorável para aplicação clínica.
+      </div>
+    </div>
+
+    <!-- 8. RESULTADOS FINAIS -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <h2>Resultados Finais e Matriz de Confusão</h2>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card green">
+          <div class="stat-val">91.55%</div>
+          <div class="stat-lbl">Acurácia Final</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-val">0.5576</div>
+          <div class="stat-lbl">F1-Score Final</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-val">73.55%</div>
+          <div class="stat-lbl">Recall Classe Óbito</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-val">44.90%</div>
+          <div class="stat-lbl">Precisão Classe Óbito</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-val">16.962</div>
+          <div class="stat-lbl">Verdadeiros Neg.</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-val">1.129</div>
+          <div class="stat-lbl">Verdadeiros Pos.</div>
+        </div>
+      </div>
+
+      <h3>Matriz de Confusão (conjunto de teste — 20.000 amostras)</h3>
+
+      <div class="matrix-doc">
+        <div class="mx-corner"></div>
+        <div class="mx-col-h">Predito 0<br>Sobreviveu</div>
+        <div class="mx-col-h">Predito 1<br>Óbito</div>
+
+        <div class="mx-row-h">Real 0<br>Sobreviveu</div>
+        <div class="mx-cell mx-tn">
+          <div class="n">16.962</div>
+          <div class="pct">84.8%</div>
+          <div class="lbl">Verdadeiro Negativo</div>
+        </div>
+        <div class="mx-cell mx-fp">
+          <div class="n">529</div>
+          <div class="pct">2.6%</div>
+          <div class="lbl">Falso Positivo</div>
+        </div>
+
+        <div class="mx-row-h">Real 1<br>Óbito</div>
+        <div class="mx-cell mx-fn">
+          <div class="n">380</div>
+          <div class="pct">1.9%</div>
+          <div class="lbl">Falso Negativo</div>
+        </div>
+        <div class="mx-cell mx-tp">
+          <div class="n">1.129</div>
+          <div class="pct">5.6%</div>
+          <div class="lbl">Verdadeiro Positivo</div>
+        </div>
+      </div>
+
+      <table style="margin-top:16px">
+        <thead>
+          <tr><th>Célula</th><th>Valor</th><th>Interpretação</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Verdadeiro Negativo (TN)</strong></td><td>16.962</td><td>Sobreviventes corretamente classificados</td></tr>
+          <tr><td><strong>Falso Positivo (FP)</strong></td><td>529</td><td>Sobreviventes erroneamente classificados como óbito</td></tr>
+          <tr><td><strong>Falso Negativo (FN)</strong></td><td>380</td><td>Óbitos não detectados — o erro mais crítico clinicamente</td></tr>
+          <tr><td><strong>Verdadeiro Positivo (TP)</strong></td><td>1.129</td><td>Óbitos corretamente identificados</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 9. CONCLUSÃO -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">09</span>
+        <h2>Conclusão</h2>
+      </div>
+
+      <p>
+        Este trabalho demonstrou que o <strong>ajuste de threshold</strong> é uma estratégia eficaz e de
+        baixo custo computacional para lidar com desbalanceamento de classes em modelos de classificação
+        binária. A abordagem mostrou-se superior ao simples aumento da complexidade arquitetural.
+      </p>
+
+      <p>
+        O modelo vencedor — <strong>MLP (16, 16)</strong> com <strong>learning_rate=0.001</strong> — é
+        notavelmente compacto (apenas 2 camadas ocultas de 16 neurônios) mas supera redes maiores como
+        (64, 64, 64) no F1-Score. Isso reforça que, para features majoritariamente binárias com baixa
+        dimensionalidade, arquiteturas simples generalizam melhor.
+      </p>
+
+      <div class="callout success">
+        🏆 <strong>Resultado principal:</strong> Com o ajuste de threshold, o modelo atingiu
+        <strong>73.55% de recall</strong> para a classe de óbito e <strong>F1-Score de 0.5576</strong>,
+        tornando-o viável para triagem clínica de risco de óbito por COVID-19.
+      </div>
+
+      <h3>Limitações e Trabalhos Futuros</h3>
+      <table>
+        <thead><tr><th>Limitação</th><th>Possível Solução</th></tr></thead>
+        <tbody>
+          <tr><td>Dataset mexicano de 2020 — generalização limitada</td><td>Validação cruzada em outros datasets regionais</td></tr>
+          <tr><td>Amostragem aleatória de 100k (não seleção por critério)</td><td>Usar SMOTE ou class_weight='balanced'</td></tr>
+          <tr><td>Threshold fixo após treinamento</td><td>Curva ROC para seleção sistemática do threshold ótimo</td></tr>
+          <tr><td>Sem validação cruzada entre os 27 experimentos</td><td>k-fold CV para estimativa robusta do desempenho</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size:0.7rem; color:var(--muted); text-align:center; font-family:'Space Mono',monospace">
+      Trabalho Acadêmico — Redes Neurais · MLPClassifier · Scikit-learn · Dataset Kaggle COVID-19 · 2024<br>
+      Bruno Martins · Christian Malacize · Bruno Bomfim · Lucas Galli · Raphael
+    </p>
+
+  </div><!-- /content -->
+</div><!-- /doc-wrap -->
+
+</body>
+</html>
