@@ -491,6 +491,15 @@
     z-index: 1;
   }
 
+  .bar-val {
+    font-size: 0.69rem;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    color: var(--text2);
+    white-space: nowrap;
+    min-width: 160px;
+  }
+
   /* ── PIPELINE ── */
   .pipeline-wrap {
     overflow-x: auto;
@@ -1000,18 +1009,16 @@
     <div class="bar-row">
       <div class="bar-lbl">Sobreviveu (0)</div>
       <div class="bar-track">
-        <div class="bar-fill" style="width:92.66%; background:linear-gradient(90deg,#00e0b0,#007d66)">
-          <span>92.66% &mdash; 971.633 registros</span>
-        </div>
+        <div class="bar-fill" style="width:92.66%; background:linear-gradient(90deg,#00e0b0,#007d66)"></div>
       </div>
+      <span class="bar-val" style="color:var(--accent2)">92.66% — 971.633</span>
     </div>
     <div class="bar-row">
       <div class="bar-lbl">Óbito (1)</div>
       <div class="bar-track">
-        <div class="bar-fill" style="width:7.34%; background:linear-gradient(90deg,#ff7a45,#aa3a10)">
-          <span>7.34% &mdash; 76.942</span>
-        </div>
+        <div class="bar-fill" style="width:7.34%; background:linear-gradient(90deg,#ff7a45,#aa3a10)"></div>
       </div>
+      <span class="bar-val" style="color:var(--warn)">7.34% — 76.942</span>
     </div>
   </div>
 
