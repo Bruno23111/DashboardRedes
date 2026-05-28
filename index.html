@@ -5,345 +5,821 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Redes Neurais — Predição COVID-19</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
   :root {
-    --bg: #080b14;
-    --surface: #0e1220;
-    --surface2: #141927;
-    --border: #1e2540;
-    --accent: #3d7eff;
-    --accent2: #00d4aa;
-    --warn: #ff6b35;
-    --purple: #9b7cff;
-    --text: #e2e8f8;
-    --muted: #5a6380;
-    --gold: #f5c842;
+    --bg: #060912;
+    --surface: #0c1020;
+    --surface2: #111827;
+    --surface3: #161e30;
+    --border: #1c2540;
+    --border2: #243060;
+    --accent: #4d8bff;
+    --accent-glow: rgba(77,139,255,0.18);
+    --accent2: #00e0b0;
+    --accent2-glow: rgba(0,224,176,0.15);
+    --warn: #ff7a45;
+    --warn-glow: rgba(255,122,69,0.15);
+    --purple: #a87eff;
+    --purple-glow: rgba(168,126,255,0.15);
+    --gold: #f7d050;
+    --gold-glow: rgba(247,208,80,0.15);
+    --text: #e8eeff;
+    --text2: #b0bcdc;
+    --muted: #4e5d80;
+    --muted2: #7a88aa;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html { scroll-behavior: smooth; }
+
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    padding: 32px 24px 60px;
+    padding: 40px 28px 80px;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(77,139,255,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,224,176,0.04) 0%, transparent 50%);
   }
 
-  /* HEADER */
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(77,139,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(77,139,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
+
+  /* ── HEADER ── */
   .header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 36px;
+    margin-bottom: 44px;
     position: relative;
   }
-  .header::before {
-    content: '';
+
+  .header-glow {
     position: absolute;
-    top: -32px; left: 50%; transform: translateX(-50%);
-    width: 600px; height: 200px;
-    background: radial-gradient(ellipse at center, rgba(61,126,255,0.12) 0%, transparent 70%);
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 300px;
+    background: radial-gradient(ellipse at center, rgba(77,139,255,0.1) 0%, transparent 65%);
     pointer-events: none;
   }
+
   .tag {
     font-family: 'Space Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     color: var(--accent);
-    background: rgba(61,126,255,0.1);
-    border: 1px solid rgba(61,126,255,0.25);
-    padding: 4px 12px;
+    background: rgba(77,139,255,0.08);
+    border: 1px solid rgba(77,139,255,0.28);
+    padding: 5px 14px;
     border-radius: 20px;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    margin-bottom: 14px;
+    margin-bottom: 18px;
+    backdrop-filter: blur(4px);
   }
+
   h1 {
     font-family: 'Space Mono', monospace;
-    font-size: 2rem;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
     font-weight: 700;
     color: #fff;
     text-align: center;
-    line-height: 1.2;
-    margin-bottom: 8px;
-  }
-  h1 span { color: var(--accent); }
-  .subtitle {
-    font-size: 0.9rem;
-    color: var(--muted);
-    text-align: center;
+    line-height: 1.15;
     margin-bottom: 10px;
-  }
-  .team-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 8px;
-  }
-  .team-pill {
-    font-size: 0.72rem;
-    color: #8892aa;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    padding: 3px 10px;
-    border-radius: 20px;
+    letter-spacing: -0.5px;
   }
 
-  /* TABS */
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+    position: relative;
+  }
+
+  h1 em::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+  }
+
+  .subtitle {
+    font-size: 0.88rem;
+    color: var(--muted2);
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 0.3px;
+  }
+
+  .subtitle code {
+    font-family: 'Space Mono', monospace;
+    color: var(--accent2);
+    font-size: 0.78rem;
+    background: rgba(0,224,176,0.07);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,224,176,0.2);
+  }
+
+  .team-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .team-pill {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--muted2);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 20px;
+    transition: all 0.2s;
+  }
+
+  .team-pill:hover {
+    border-color: var(--border2);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+
+  /* ── TABS ── */
   .tabs {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     justify-content: center;
-    margin-bottom: 30px;
+    margin-bottom: 32px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 5px;
     width: fit-content;
     margin-left: auto;
     margin-right: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   }
+
   .tab {
-    padding: 8px 20px;
-    border-radius: 8px;
+    padding: 9px 22px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 0.82rem;
     font-weight: 500;
     color: var(--muted);
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(.4,0,.2,1);
     user-select: none;
+    white-space: nowrap;
   }
+
   .tab.active {
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent), #2a60e8);
     color: #fff;
     font-weight: 600;
+    box-shadow: 0 2px 12px rgba(77,139,255,0.35);
   }
-  .tab:hover:not(.active) { color: var(--text); background: var(--surface2); }
+
+  .tab:hover:not(.active) {
+    color: var(--text2);
+    background: var(--surface2);
+  }
 
   .page { display: none; }
-  .page.active { display: block; animation: fadeIn 0.3s ease; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  .page.active {
+    display: block;
+    animation: fadeUp 0.35s cubic-bezier(.4,0,.2,1);
+  }
 
-  /* SECTION */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION TITLE ── */
   .section-title {
     font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
     color: var(--muted);
-    margin-bottom: 14px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
+
   .section-title::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: var(--border);
+    background: linear-gradient(90deg, var(--border), transparent);
   }
 
-  /* STAT CARDS */
+  /* ── STAT CARDS ── */
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 12px;
-    margin-bottom: 28px;
+    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
   }
+
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
+    border-radius: 14px;
+    padding: 20px 18px;
     position: relative;
     overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   }
+
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border2);
+  }
+
   .card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
-    background: var(--accent);
+    background: linear-gradient(90deg, var(--accent), transparent);
   }
-  .card.green::before { background: var(--accent2); }
-  .card.orange::before { background: var(--warn); }
-  .card.purple::before { background: var(--purple); }
-  .card.gold::before { background: var(--gold); }
+
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 60px; height: 60px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .card.green::before  { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .card.orange::before { background: linear-gradient(90deg, var(--warn), transparent); }
+  .card.purple::before { background: linear-gradient(90deg, var(--purple), transparent); }
+  .card.gold::before   { background: linear-gradient(90deg, var(--gold), transparent); }
+
+  .card.green::after  { background: radial-gradient(circle, var(--accent2-glow) 0%, transparent 70%); }
+  .card.orange::after { background: radial-gradient(circle, var(--warn-glow) 0%, transparent 70%); }
+  .card.purple::after { background: radial-gradient(circle, var(--purple-glow) 0%, transparent 70%); }
+  .card.gold::after   { background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%); }
+
+  .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .card.green:hover  { box-shadow: 0 8px 32px rgba(0,224,176,0.1); }
+  .card.orange:hover { box-shadow: 0 8px 32px rgba(255,122,69,0.1); }
+  .card.purple:hover { box-shadow: 0 8px 32px rgba(168,126,255,0.1); }
+  .card.gold:hover   { box-shadow: 0 8px 32px rgba(247,208,80,0.1); }
+
+  .card-icon {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+
   .card-value {
     font-family: 'Space Mono', monospace;
-    font-size: 1.7rem;
+    font-size: 1.75rem;
     font-weight: 700;
     color: var(--accent);
     line-height: 1;
-    margin-bottom: 6px;
+    margin-bottom: 7px;
+    letter-spacing: -0.5px;
   }
-  .card.green .card-value { color: var(--accent2); }
+
+  .card.green .card-value  { color: var(--accent2); }
   .card.orange .card-value { color: var(--warn); }
   .card.purple .card-value { color: var(--purple); }
-  .card.gold .card-value { color: var(--gold); }
+  .card.gold .card-value   { color: var(--gold); }
+
   .card-label {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
+    font-weight: 500;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
 
-  /* BAR CHART */
-  .bar-chart { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
-  .bar-row { display: flex; align-items: center; gap: 12px; }
-  .bar-lbl { font-size: 0.73rem; color: #8892aa; min-width: 140px; text-align: right; font-family: 'Space Mono', monospace; }
+  /* ── BAR CHART ── */
+  .bar-chart { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+
+  .bar-row { display: flex; align-items: center; gap: 14px; }
+
+  .bar-lbl {
+    font-size: 0.72rem;
+    color: var(--muted2);
+    min-width: 150px;
+    text-align: right;
+    font-family: 'Space Mono', monospace;
+  }
+
   .bar-track {
-    flex: 1; height: 24px;
+    flex: 1;
+    height: 28px;
     background: var(--surface2);
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
     border: 1px solid var(--border);
+    position: relative;
   }
-  .bar-fill {
-    height: 100%; border-radius: 6px;
-    display: flex; align-items: center; justify-content: flex-end;
-    padding-right: 10px;
-    transition: width 1.2s cubic-bezier(.22,.68,0,1.2);
-  }
-  .bar-fill span { font-size: 0.7rem; color: #fff; font-weight: 700; font-family: 'Space Mono', monospace; }
 
-  /* PIPELINE */
-  .pipeline-wrap { overflow-x: auto; padding-bottom: 10px; margin-bottom: 24px; }
-  .pipeline {
+  .bar-fill {
+    height: 100%;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    gap: 0;
-    min-width: 900px;
+    justify-content: flex-end;
+    padding-right: 12px;
+    transition: width 1.4s cubic-bezier(.22,.68,0,1.1);
+    position: relative;
   }
+
+  .bar-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+    border-radius: 8px;
+  }
+
+  .bar-fill span {
+    font-size: 0.69rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── PIPELINE ── */
+  .pipeline-wrap {
+    overflow-x: auto;
+    padding-bottom: 12px;
+    margin-bottom: 28px;
+  }
+
+  .pipeline-wrap::-webkit-scrollbar { height: 4px; }
+  .pipeline-wrap::-webkit-scrollbar-track { background: var(--surface2); border-radius: 2px; }
+  .pipeline-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  .pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    min-width: 960px;
+  }
+
   .pipe-step {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
+    border-radius: 12px;
+    padding: 14px 12px;
     text-align: center;
     flex: 1;
-    min-width: 90px;
+    min-width: 96px;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
   }
-  .pipe-step .icon { font-size: 1.4rem; margin-bottom: 5px; }
-  .pipe-step .ptitle { font-size: 0.72rem; font-weight: 600; color: #ccc; }
-  .pipe-step .pdesc { font-size: 0.63rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
-  .pipe-arrow { color: var(--accent); font-size: 1.1rem; padding: 0 4px; flex-shrink: 0; }
 
-  /* TABLE */
-  .exp-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-bottom: 20px; }
+  .pipe-step::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .pipe-step:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .pipe-step:hover::before { opacity: 1; }
+
+  .pipe-step .icon { font-size: 1.5rem; margin-bottom: 6px; display: block; }
+  .pipe-step .ptitle { font-size: 0.73rem; font-weight: 700; color: var(--text2); margin-bottom: 4px; }
+  .pipe-step .pdesc { font-size: 0.62rem; color: var(--muted); line-height: 1.5; }
+
+  .pipe-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    flex-shrink: 0;
+  }
+
+  .pipe-arrow svg {
+    width: 16px; height: 16px;
+    color: var(--accent);
+    opacity: 0.6;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .exp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.76rem;
+  }
+
   .exp-table th {
     background: var(--surface2);
-    color: var(--muted);
-    padding: 10px 12px;
+    color: var(--muted2);
+    padding: 12px 14px;
     text-align: left;
     font-weight: 600;
-    font-size: 0.68rem;
+    font-size: 0.67rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
     border-bottom: 1px solid var(--border);
+    white-space: nowrap;
   }
-  .exp-table td {
-    padding: 9px 12px;
-    border-bottom: 1px solid var(--border);
-    color: #b0b8d0;
-  }
-  .exp-table tr:hover td { background: var(--surface2); }
-  .badge-gold { background: rgba(245,200,66,0.1); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); padding: 2px 8px; border-radius: 8px; font-size: 0.68rem; font-weight: 700; }
-  .badge-blue { background: rgba(61,126,255,0.1); color: var(--accent); border: 1px solid rgba(61,126,255,0.3); padding: 2px 8px; border-radius: 8px; font-size: 0.68rem; }
 
-  /* COMPARE METRICS */
-  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .exp-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
+    transition: background 0.15s;
+  }
+
+  .exp-table tr:last-child td { border-bottom: none; }
+  .exp-table tr:hover td { background: rgba(77,139,255,0.04); }
+
+  .exp-table tr:first-child td { color: var(--text); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 8px;
+    font-size: 0.67rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .badge-gold { background: rgba(247,208,80,0.1); color: var(--gold); border: 1px solid rgba(247,208,80,0.3); }
+  .badge-blue { background: rgba(77,139,255,0.08); color: var(--accent); border: 1px solid rgba(77,139,255,0.2); }
+
+  /* ── COMPARE METRICS ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
   .compare-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
+    border-radius: 14px;
+    padding: 20px;
+    transition: border-color 0.2s;
   }
+
+  .compare-card.highlight {
+    border-color: rgba(0,224,176,0.3);
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(0,224,176,0.03) 100%);
+  }
+
   .compare-card h4 {
-    font-size: 0.78rem;
+    font-size: 0.79rem;
     font-weight: 600;
-    color: #ccc;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
+    color: var(--text2);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--border);
   }
-  .gauge-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .gauge-label { font-size: 0.7rem; color: var(--muted); width: 85px; }
+
+  .gauge-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .gauge-label { font-size: 0.69rem; color: var(--muted2); width: 90px; font-weight: 500; }
+
   .gauge-bar {
-    flex: 1; height: 10px;
+    flex: 1;
+    height: 8px;
     background: var(--surface2);
     border-radius: 4px;
     overflow: hidden;
+    border: 1px solid var(--border);
   }
-  .gauge-fill { height: 100%; border-radius: 4px; }
-  .gauge-val { font-family: 'Space Mono', monospace; font-size: 0.7rem; font-weight: 700; width: 48px; text-align: right; }
 
-  /* MATRIX */
-  .matrix-wrap { display: flex; justify-content: center; margin-bottom: 24px; }
-  .matrix-inner { text-align: center; }
-  .matrix-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
-  .matrix-row-label { width: 50px; font-size: 0.65rem; color: var(--muted); text-align: center; font-family: 'Space Mono', monospace; }
+  .gauge-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1.2s cubic-bezier(.22,.68,0,1.1);
+    position: relative;
+  }
+
+  .gauge-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+  }
+
+  .gauge-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.69rem;
+    font-weight: 700;
+    width: 58px;
+    text-align: right;
+  }
+
+  /* ── CONFUSION MATRIX ── */
+  .matrix-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .matrix-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    align-self: flex-start;
+    width: 100%;
+  }
+
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 52px 1fr 1fr;
+    grid-template-rows: auto 1fr 1fr;
+    gap: 6px;
+  }
+
+  .matrix-corner { display: flex; align-items: flex-end; justify-content: flex-end; }
+  .matrix-col-h {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.62rem;
+    color: var(--muted2);
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+    line-height: 1.4;
+    padding-bottom: 4px;
+  }
+
+  .matrix-row-h {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    font-size: 0.62rem;
+    color: var(--muted2);
+    font-family: 'Space Mono', monospace;
+    text-align: right;
+    line-height: 1.4;
+  }
+
   .m-cell {
-    width: 90px; height: 75px;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    border-radius: 10px;
+    width: 110px;
+    height: 84px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
     border: 1px solid;
+    transition: transform 0.2s;
   }
-  .m-cell .big { font-family: 'Space Mono', monospace; font-size: 1.4rem; font-weight: 700; }
-  .m-cell .small { font-size: 0.63rem; margin-top: 3px; opacity: 0.7; }
-  .cell-tn { background: rgba(0,212,170,0.07); border-color: rgba(0,212,170,0.25); }
-  .cell-tn .big { color: var(--accent2); }
-  .cell-fp { background: rgba(255,107,53,0.07); border-color: rgba(255,107,53,0.25); }
-  .cell-fp .big { color: var(--warn); }
-  .cell-fn { background: rgba(255,107,53,0.07); border-color: rgba(255,107,53,0.25); }
-  .cell-fn .big { color: var(--warn); }
-  .cell-tp { background: rgba(245,200,66,0.1); border-color: rgba(245,200,66,0.3); }
-  .cell-tp .big { color: var(--gold); }
-  .matrix-col-labels { display: flex; gap: 6px; margin-bottom: 6px; padding-left: 56px; }
-  .matrix-col-labels span { width: 90px; text-align: center; font-size: 0.65rem; color: var(--muted); font-family: 'Space Mono', monospace; }
 
-  /* INFO BOX */
+  .m-cell:hover { transform: scale(1.04); }
+
+  .m-cell .big {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .m-cell .pct {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    opacity: 0.7;
+    margin-top: 3px;
+  }
+
+  .m-cell .lbl {
+    font-size: 0.6rem;
+    margin-top: 3px;
+    opacity: 0.6;
+    text-align: center;
+  }
+
+  .cell-tn { background: rgba(0,224,176,0.07); border-color: rgba(0,224,176,0.25); }
+  .cell-tn .big { color: var(--accent2); }
+  .cell-tn .pct { color: var(--accent2); }
+
+  .cell-fp { background: rgba(255,122,69,0.07); border-color: rgba(255,122,69,0.25); }
+  .cell-fp .big { color: var(--warn); }
+  .cell-fp .pct { color: var(--warn); }
+
+  .cell-fn { background: rgba(255,122,69,0.07); border-color: rgba(255,122,69,0.25); }
+  .cell-fn .big { color: var(--warn); }
+  .cell-fn .pct { color: var(--warn); }
+
+  .cell-tp { background: rgba(247,208,80,0.08); border-color: rgba(247,208,80,0.3); }
+  .cell-tp .big { color: var(--gold); }
+  .cell-tp .pct { color: var(--gold); }
+
+  /* ── INFO BOX ── */
   .info-box {
     background: var(--surface);
     border: 1px solid var(--border);
     border-left: 3px solid var(--accent);
-    border-radius: 8px;
-    padding: 14px 16px;
-    font-size: 0.77rem;
-    color: #9aa3bb;
-    line-height: 1.7;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 0.79rem;
+    color: var(--text2);
+    line-height: 1.75;
     margin-bottom: 16px;
   }
-  .info-box.warn { border-left-color: var(--warn); }
-  .info-box.success { border-left-color: var(--accent2); }
-  .info-box strong { color: var(--text); }
 
-  /* FEATURES */
-  .feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 20px; }
+  .info-box.warn    { border-left-color: var(--warn);    background: rgba(255,122,69,0.03); }
+  .info-box.success { border-left-color: var(--accent2); background: rgba(0,224,176,0.03); }
+  .info-box.purple  { border-left-color: var(--purple);  background: rgba(168,126,255,0.03); }
+
+  .info-box strong { color: var(--text); }
+  .info-box code {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    background: var(--surface2);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--accent2);
+    border: 1px solid var(--border);
+  }
+
+  /* ── FEATURES ── */
+  .feat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
   .feat-item {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 9px;
     padding: 8px 12px;
-    font-size: 0.72rem;
-    color: #9aa3bb;
+    font-size: 0.71rem;
+    color: var(--muted2);
     display: flex;
     align-items: center;
     gap: 8px;
     font-family: 'Space Mono', monospace;
+    transition: border-color 0.2s, color 0.2s;
   }
-  .feat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  .feat-item:hover {
+    border-color: var(--border2);
+    color: var(--text2);
+  }
+
+  .feat-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  /* ── ARCH CARDS ── */
+  .arch-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .arch-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .arch-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+  .arch-badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-glow);
+    border: 1px solid rgba(77,139,255,0.25);
+    padding: 4px 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+
+  .arch-card.green .arch-badge { color: var(--accent2); background: var(--accent2-glow); border-color: rgba(0,224,176,0.25); }
+  .arch-card.purple .arch-badge { color: var(--purple); background: var(--purple-glow); border-color: rgba(168,126,255,0.25); }
+  .arch-card.orange .arch-badge { color: var(--warn); background: var(--warn-glow); border-color: rgba(255,122,69,0.25); }
+
+  .arch-card p { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+
+  /* ── RESULT HIGHLIGHT ── */
+  .result-highlight {
+    background: linear-gradient(135deg, rgba(247,208,80,0.05), rgba(0,224,176,0.05));
+    border: 1px solid rgba(247,208,80,0.2);
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .result-highlight .trophy { font-size: 2rem; flex-shrink: 0; }
+
+  .result-highlight-body { flex: 1; }
+
+  .result-highlight-body h3 {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 5px;
+  }
+
+  .result-highlight-body p {
+    font-size: 0.75rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    body { padding: 20px 16px 60px; }
+
+    .tabs { gap: 2px; padding: 4px; }
+    .tab { padding: 7px 12px; font-size: 0.75rem; }
+
+    .compare-grid { grid-template-columns: 1fr; }
+
+    .bar-lbl { min-width: 100px; font-size: 0.65rem; }
+
+    .m-cell { width: 90px; height: 72px; }
+    .m-cell .big { font-size: 1.2rem; }
+  }
 </style>
 </head>
 <body>
+<div class="container">
 
+<!-- HEADER -->
 <div class="header">
-  <div class="tag">Trabalho Acadêmico · Redes Neurais</div>
-  <h1>Predição de Óbito<br><span>COVID-19</span></h1>
-  <p class="subtitle">MLPClassifier · Scikit-learn · Dataset Kaggle (1M+ registros)</p>
+  <div class="header-glow"></div>
+  <div class="tag">Trabalho Acadêmico &middot; Redes Neurais</div>
+  <h1>Predição de Óbito<br><em>COVID-19</em></h1>
+  <p class="subtitle"><code>MLPClassifier</code> &middot; Scikit-learn &middot; Dataset Kaggle (1M+ registros)</p>
   <div class="team-row">
     <span class="team-pill">Bruno Martins</span>
     <span class="team-pill">Christian Malacize</span>
@@ -353,6 +829,7 @@
   </div>
 </div>
 
+<!-- TABS -->
 <div class="tabs">
   <div class="tab active" onclick="show('visao', this)">📊 Visão Geral</div>
   <div class="tab" onclick="show('pipeline', this)">🔧 Pipeline</div>
@@ -360,157 +837,273 @@
   <div class="tab" onclick="show('resultados', this)">🏆 Resultados</div>
 </div>
 
-<!-- VISÃO GERAL -->
+<!-- ══════════════════════════════════════════════ VISÃO GERAL -->
 <div class="page active" id="visao">
   <div class="cards">
-    <div class="card"><div class="card-value">1.048.575</div><div class="card-label">Registros Originais</div></div>
-    <div class="card green"><div class="card-value">100.000</div><div class="card-label">Amostra Utilizada</div></div>
-    <div class="card orange"><div class="card-value">15</div><div class="card-label">Features de Entrada</div></div>
-    <div class="card purple"><div class="card-value">27</div><div class="card-label">Experimentos</div></div>
-    <div class="card gold"><div class="card-value">91.55%</div><div class="card-label">Acurácia Final</div></div>
+    <div class="card">
+      <span class="card-icon">🗄️</span>
+      <div class="card-value">1.048.575</div>
+      <div class="card-label">Registros Originais</div>
+    </div>
+    <div class="card green">
+      <span class="card-icon">🎲</span>
+      <div class="card-value">100.000</div>
+      <div class="card-label">Amostra Utilizada</div>
+    </div>
+    <div class="card orange">
+      <span class="card-icon">📐</span>
+      <div class="card-value">15</div>
+      <div class="card-label">Features de Entrada</div>
+    </div>
+    <div class="card purple">
+      <span class="card-icon">🔬</span>
+      <div class="card-value">27</div>
+      <div class="card-label">Experimentos</div>
+    </div>
+    <div class="card gold">
+      <span class="card-icon">🎯</span>
+      <div class="card-value">91.55%</div>
+      <div class="card-label">Acurácia Final</div>
+    </div>
   </div>
 
-  <div class="section-title">Distribuição das Classes</div>
+  <div class="section-title">Distribuição das Classes no Dataset</div>
   <div class="bar-chart">
     <div class="bar-row">
       <div class="bar-lbl">Sobreviveu (0)</div>
       <div class="bar-track">
-        <div class="bar-fill" style="width:92.66%; background:linear-gradient(90deg,#00d4aa,#007d66)">
-          <span>92.66% — 971.633</span>
+        <div class="bar-fill" style="width:92.66%; background:linear-gradient(90deg,#00e0b0,#007d66)">
+          <span>92.66% &mdash; 971.633 registros</span>
         </div>
       </div>
     </div>
     <div class="bar-row">
       <div class="bar-lbl">Óbito (1)</div>
       <div class="bar-track">
-        <div class="bar-fill" style="width:7.34%; background:linear-gradient(90deg,#ff6b35,#aa3a10)">
-          <span>7.34%</span>
+        <div class="bar-fill" style="width:7.34%; background:linear-gradient(90deg,#ff7a45,#aa3a10)">
+          <span>7.34% &mdash; 76.942</span>
         </div>
       </div>
     </div>
   </div>
 
   <div class="info-box warn">
-    ⚠️ <strong>Desbalanceamento de classes (13:1):</strong> Este foi o principal desafio do projeto. O modelo tende a "ignorar" a classe minoritária (óbito), gerando alta acurácia geral mas baixo recall para casos críticos. A solução adotada foi o <strong>ajuste de threshold</strong> após o treinamento.
+    ⚠️ <strong>Desbalanceamento severo de classes (13:1):</strong> Este foi o principal desafio do projeto.
+    O modelo tende a "ignorar" a classe minoritária (óbito), gerando alta acurácia geral mas baixo recall
+    para casos críticos. A solução adotada foi o <strong>ajuste de threshold</strong> pós-treinamento,
+    sem necessidade de reamostrar os dados.
   </div>
 
-  <div class="section-title">Features Utilizadas (15 atributos)</div>
+  <div class="section-title">Features Utilizadas — 15 Atributos</div>
   <div class="feat-grid">
-    <div class="feat-item"><div class="feat-dot" style="background:#9b7cff"></div>USMER</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#9b7cff"></div>MEDICAL_UNIT</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#3d7eff"></div>SEX</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>PNEUMONIA</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#00d4aa"></div>AGE ★ numérica</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>DIABETES</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>COPD</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>ASTHMA</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>INMSUPR</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>HIPERTENSION</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>OTHER_DISEASE</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>CARDIOVASCULAR</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>OBESITY</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>RENAL_CHRONIC</div>
-    <div class="feat-item"><div class="feat-dot" style="background:#ff6b35"></div>TOBACCO</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--purple); color:var(--purple)"></div>USMER</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--purple); color:var(--purple)"></div>MEDICAL_UNIT</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--accent); color:var(--accent)"></div>SEX</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>PNEUMONIA</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--accent2); color:var(--accent2)"></div>AGE ★ num.</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>DIABETES</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>COPD</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>ASTHMA</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>INMSUPR</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>HIPERTENSION</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>OTHER_DISEASE</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>CARDIOVASCULAR</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>OBESITY</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>RENAL_CHRONIC</div>
+    <div class="feat-item"><div class="feat-dot" style="background:var(--warn); color:var(--warn)"></div>TOBACCO</div>
   </div>
-  <p style="font-size:0.68rem; color:var(--muted); margin-top:-10px">★ AGE = numérica (StandardScaler) · demais = categóricas (OneHotEncoder)</p>
+  <p style="font-size:0.68rem; color:var(--muted); margin-top:4px">
+    ★ AGE = numérica (StandardScaler) &nbsp;·&nbsp; demais = categóricas binárias (OneHotEncoder)
+  </p>
 </div>
 
-<!-- PIPELINE -->
+<!-- ══════════════════════════════════════════════ PIPELINE -->
 <div class="page" id="pipeline">
   <div class="section-title">Fluxo Completo do Projeto</div>
   <div class="pipeline-wrap">
     <div class="pipeline">
-      <div class="pipe-step"><div class="icon">📥</div><div class="ptitle">Dataset</div><div class="pdesc">Kaggle COVID-19<br>1.048.575 linhas<br>21 colunas</div></div>
-      <div class="pipe-arrow">→</div>
-      <div class="pipe-step"><div class="icon">🎯</div><div class="ptitle">Alvo</div><div class="pdesc">morte = 0/1<br>via DATE_DIED<br>classificação bin.</div></div>
-      <div class="pipe-arrow">→</div>
-      <div class="pipe-step"><div class="icon">🧹</div><div class="ptitle">Limpeza</div><div class="pdesc">Remove 6 cols<br>97/99 → NaN<br>dropna()</div></div>
-      <div class="pipe-arrow">→</div>
-      <div class="pipe-step"><div class="icon">🎲</div><div class="ptitle">Amostra</div><div class="pdesc">100k linhas<br>random_state=42<br>estratificado</div></div>
-      <div class="pipe-arrow">→</div>
-      <div class="pipe-step"><div class="icon">⚙️</div><div class="ptitle">Pré-proc.</div><div class="pdesc">Scaler + OHE<br>ColumnTransformer<br>fit no treino</div></div>
-      <div class="pipe-arrow">→</div>
-      <div class="pipe-step"><div class="icon">✂️</div><div class="ptitle">Split</div><div class="pdesc">80% treino<br>20% teste<br>stratify=y</div></div>
-      <div class="pipe-arrow">→</div>
-      <div class="pipe-step"><div class="icon">🧠</div><div class="ptitle">MLP</div><div class="pdesc">27 configs<br>3 arquiteturas<br>3 LR</div></div>
-      <div class="pipe-arrow">→</div>
-      <div class="pipe-step"><div class="icon">🔍</div><div class="ptitle">Threshold</div><div class="pdesc">Ajuste limiar<br>↑ recall cls.1<br>ponto crítico</div></div>
-      <div class="pipe-arrow">→</div>
-      <div class="pipe-step"><div class="icon">📊</div><div class="ptitle">Avaliação</div><div class="pdesc">Acurácia, F1<br>Recall, Precisão<br>Matriz Conf.</div></div>
+      <div class="pipe-step">
+        <span class="icon">📥</span>
+        <div class="ptitle">Dataset</div>
+        <div class="pdesc">Kaggle COVID-19<br>1.048.575 linhas<br>21 colunas</div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      <div class="pipe-step">
+        <span class="icon">🎯</span>
+        <div class="ptitle">Alvo</div>
+        <div class="pdesc">morte = 0/1<br>via DATE_DIED<br>classificação bin.</div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      <div class="pipe-step">
+        <span class="icon">🧹</span>
+        <div class="ptitle">Limpeza</div>
+        <div class="pdesc">Remove 6 cols<br>97/99 → NaN<br>dropna()</div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      <div class="pipe-step">
+        <span class="icon">🎲</span>
+        <div class="ptitle">Amostra</div>
+        <div class="pdesc">100k linhas<br>random_state=42<br>estratificado</div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      <div class="pipe-step">
+        <span class="icon">⚙️</span>
+        <div class="ptitle">Pré-proc.</div>
+        <div class="pdesc">Scaler + OHE<br>ColumnTransformer<br>fit no treino</div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      <div class="pipe-step">
+        <span class="icon">✂️</span>
+        <div class="ptitle">Split</div>
+        <div class="pdesc">80% treino<br>20% teste<br>stratify=y</div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      <div class="pipe-step">
+        <span class="icon">🧠</span>
+        <div class="ptitle">MLP</div>
+        <div class="pdesc">27 configs<br>3 arquiteturas<br>3 LR testadas</div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      <div class="pipe-step">
+        <span class="icon">🔍</span>
+        <div class="ptitle">Threshold</div>
+        <div class="pdesc">Ajuste limiar<br>↑ recall cls.1<br>ponto crítico</div>
+      </div>
+      <div class="pipe-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+      <div class="pipe-step">
+        <span class="icon">📊</span>
+        <div class="ptitle">Avaliação</div>
+        <div class="pdesc">Acurácia, F1<br>Recall, Precisão<br>Matriz Conf.</div>
+      </div>
     </div>
   </div>
 
-  <div class="section-title">Configurações Testadas (27 combinações = 3 arq × 3 LR × 3 tamanhos)</div>
-  <div class="cards">
-    <div class="card"><div class="card-value" style="font-size:1.1rem">(16,) · (32,) · (64,)</div><div class="card-label">1 camada oculta</div></div>
-    <div class="card green"><div class="card-value" style="font-size:1.1rem">(16,16) · (32,32) · (64,64)</div><div class="card-label">2 camadas ocultas</div></div>
-    <div class="card purple"><div class="card-value" style="font-size:1.1rem">(16,16,16) · (32,32,32) · (64,64,64)</div><div class="card-label">3 camadas ocultas</div></div>
-    <div class="card orange"><div class="card-value">0.0001 · 0.001 · 0.01</div><div class="card-label">Learning Rates</div></div>
+  <div class="section-title">Configurações Testadas — 27 Combinações</div>
+  <div class="arch-cards">
+    <div class="arch-card">
+      <div class="arch-badge">(16,) · (32,) · (64,)</div>
+      <p>1 camada oculta &mdash; arquitetura simples, convergência rápida</p>
+    </div>
+    <div class="arch-card green">
+      <div class="arch-badge">(16,16) · (32,32) · (64,64)</div>
+      <p>2 camadas ocultas &mdash; <strong>melhor resultado geral</strong></p>
+    </div>
+    <div class="arch-card purple">
+      <div class="arch-badge">(16,16,16) · (32,32,32) · (64,64,64)</div>
+      <p>3 camadas ocultas &mdash; maior capacidade de representação</p>
+    </div>
+    <div class="arch-card orange">
+      <div class="arch-badge">0.0001 · 0.001 · 0.01</div>
+      <p>Learning rates testadas &mdash; 3 valores por arquitetura</p>
+    </div>
   </div>
 
   <div class="info-box">
     <strong>Pré-processamento detalhado:</strong><br>
-    • <strong>AGE</strong> → StandardScaler (z-score) — única variável numérica<br>
-    • <strong>14 features categóricas</strong> → OneHotEncoder com <code>drop='first'</code> para evitar multicolinearidade<br>
-    • Preprocessador ajustado <em>apenas no treino</em> (fit_transform) e aplicado ao teste (transform) — evita data leakage<br>
-    • Colunas removidas: DATE_DIED (originou o alvo), INTUBED, ICU, PATIENT_TYPE, CLASIFFICATION_FINAL, PREGNANT
+    &bull; <strong>AGE</strong> → <code>StandardScaler</code> (z-score) — única variável numérica contínua<br>
+    &bull; <strong>14 features categóricas</strong> → <code>OneHotEncoder(drop='first')</code> para evitar multicolinearidade<br>
+    &bull; Preprocessador ajustado <em>apenas no treino</em> (<code>fit_transform</code>) e aplicado ao teste (<code>transform</code>) — evita data leakage<br>
+    &bull; Colunas removidas: <code>DATE_DIED</code> (originou o alvo), <code>INTUBED</code>, <code>ICU</code>, <code>PATIENT_TYPE</code>, <code>CLASIFFICATION_FINAL</code>, <code>PREGNANT</code>
   </div>
 </div>
 
-<!-- EXPERIMENTOS -->
+<!-- ══════════════════════════════════════════════ EXPERIMENTOS -->
 <div class="page" id="experimentos">
   <div class="section-title">Top 10 Experimentos por F1-Score</div>
-  <table class="exp-table">
-    <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Exp #</th>
-        <th>Arquitetura</th>
-        <th>Learning Rate</th>
-        <th>Acurácia</th>
-        <th>F1-Score</th>
-        <th>Recall cls.1</th>
-        <th>Iterações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td><span class="badge-gold">🥇 1°</span></td><td>11</td><td><strong>(16, 16)</strong></td><td>0.001</td><td>93.25%</td><td><strong>0.4639</strong></td><td>40.33%</td><td>82</td></tr>
-      <tr><td><span class="badge-blue">2°</span></td><td>21</td><td>(16, 16, 16)</td><td>0.01</td><td>93.44%</td><td>0.4583</td><td>38.33%</td><td>40</td></tr>
-      <tr><td><span class="badge-blue">3°</span></td><td>22</td><td>(32, 32, 32)</td><td>0.0001</td><td>93.45%</td><td>0.4457</td><td>36.40%</td><td>41</td></tr>
-      <tr><td><span class="badge-blue">4°</span></td><td>7</td><td>(64,)</td><td>0.0001</td><td>93.38%</td><td>0.4414</td><td>36.12%</td><td>50</td></tr>
-      <tr><td><span class="badge-blue">5°</span></td><td>2</td><td>(16,)</td><td>0.001</td><td>93.34%</td><td>0.4380</td><td>35.84%</td><td>47</td></tr>
-      <tr><td><span class="badge-blue">6°</span></td><td>16</td><td>(64, 64)</td><td>0.0001</td><td>93.46%</td><td>0.4321</td><td>34.39%</td><td>66</td></tr>
-      <tr><td><span class="badge-blue">7°</span></td><td>1</td><td>(16,)</td><td>0.0001</td><td>93.31%</td><td>0.4311</td><td>35.01%</td><td>43</td></tr>
-      <tr><td><span class="badge-blue">8°</span></td><td>6</td><td>(32,)</td><td>0.01</td><td>93.38%</td><td>0.4298</td><td>34.46%</td><td>58</td></tr>
-      <tr><td><span class="badge-blue">9°</span></td><td>9</td><td>(64,)</td><td>0.01</td><td>93.20%</td><td>0.4257</td><td>34.81%</td><td>90</td></tr>
-      <tr><td><span class="badge-blue">10°</span></td><td>14</td><td>(32, 32)</td><td>0.001</td><td>93.28%</td><td>0.4237</td><td>34.12%</td><td>118</td></tr>
-    </tbody>
-  </table>
+  <div class="table-wrap">
+    <table class="exp-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Exp #</th>
+          <th>Arquitetura</th>
+          <th>Learning Rate</th>
+          <th>Acurácia</th>
+          <th>F1-Score</th>
+          <th>Recall cls.1</th>
+          <th>Iterações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-gold">🥇 1°</span></td>
+          <td>11</td><td><strong>(16, 16)</strong></td><td>0.001</td>
+          <td>93.25%</td><td><strong>0.4639</strong></td><td>40.33%</td><td>82</td>
+        </tr>
+        <tr><td><span class="badge badge-blue">2°</span></td><td>21</td><td>(16, 16, 16)</td><td>0.01</td><td>93.44%</td><td>0.4583</td><td>38.33%</td><td>40</td></tr>
+        <tr><td><span class="badge badge-blue">3°</span></td><td>22</td><td>(32, 32, 32)</td><td>0.0001</td><td>93.45%</td><td>0.4457</td><td>36.40%</td><td>41</td></tr>
+        <tr><td><span class="badge badge-blue">4°</span></td><td>7</td><td>(64,)</td><td>0.0001</td><td>93.38%</td><td>0.4414</td><td>36.12%</td><td>50</td></tr>
+        <tr><td><span class="badge badge-blue">5°</span></td><td>2</td><td>(16,)</td><td>0.001</td><td>93.34%</td><td>0.4380</td><td>35.84%</td><td>47</td></tr>
+        <tr><td><span class="badge badge-blue">6°</span></td><td>16</td><td>(64, 64)</td><td>0.0001</td><td>93.46%</td><td>0.4321</td><td>34.39%</td><td>66</td></tr>
+        <tr><td><span class="badge badge-blue">7°</span></td><td>1</td><td>(16,)</td><td>0.0001</td><td>93.31%</td><td>0.4311</td><td>35.01%</td><td>43</td></tr>
+        <tr><td><span class="badge badge-blue">8°</span></td><td>6</td><td>(32,)</td><td>0.01</td><td>93.38%</td><td>0.4298</td><td>34.46%</td><td>58</td></tr>
+        <tr><td><span class="badge badge-blue">9°</span></td><td>9</td><td>(64,)</td><td>0.01</td><td>93.20%</td><td>0.4257</td><td>34.81%</td><td>90</td></tr>
+        <tr><td><span class="badge badge-blue">10°</span></td><td>14</td><td>(32, 32)</td><td>0.001</td><td>93.28%</td><td>0.4237</td><td>34.12%</td><td>118</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-  <div class="section-title">F1-Score — Top 6 Arquiteturas</div>
+  <div class="section-title">F1-Score &mdash; Top 6 Arquiteturas (comparação visual)</div>
   <div class="bar-chart">
-    <div class="bar-row"><div class="bar-lbl">(16,16) lr=0.001</div><div class="bar-track"><div class="bar-fill" style="width:100%; background:linear-gradient(90deg,#f5c842,#c9920d)"><span>0.4639</span></div></div></div>
-    <div class="bar-row"><div class="bar-lbl">(16,16,16) lr=0.01</div><div class="bar-track"><div class="bar-fill" style="width:98.8%; background:linear-gradient(90deg,#3d7eff,#1040b0)"><span>0.4583</span></div></div></div>
-    <div class="bar-row"><div class="bar-lbl">(32,32,32) lr=0.0001</div><div class="bar-track"><div class="bar-fill" style="width:96.1%; background:linear-gradient(90deg,#3d7eff,#1040b0)"><span>0.4457</span></div></div></div>
-    <div class="bar-row"><div class="bar-lbl">(64,) lr=0.0001</div><div class="bar-track"><div class="bar-fill" style="width:95.2%; background:linear-gradient(90deg,#9b7cff,#5b3cc9)"><span>0.4414</span></div></div></div>
-    <div class="bar-row"><div class="bar-lbl">(16,) lr=0.001</div><div class="bar-track"><div class="bar-fill" style="width:94.4%; background:linear-gradient(90deg,#00d4aa,#007d66)"><span>0.4380</span></div></div></div>
-    <div class="bar-row"><div class="bar-lbl">(64,64) lr=0.0001</div><div class="bar-track"><div class="bar-fill" style="width:93.2%; background:linear-gradient(90deg,#00d4aa,#007d66)"><span>0.4321</span></div></div></div>
+    <div class="bar-row">
+      <div class="bar-lbl">(16,16) lr=0.001</div>
+      <div class="bar-track"><div class="bar-fill" style="width:100%; background:linear-gradient(90deg,#f7d050,#c9920d)"><span>0.4639 🥇</span></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-lbl">(16,16,16) lr=0.01</div>
+      <div class="bar-track"><div class="bar-fill" style="width:98.8%; background:linear-gradient(90deg,#4d8bff,#1040b0)"><span>0.4583</span></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-lbl">(32,32,32) lr=0.0001</div>
+      <div class="bar-track"><div class="bar-fill" style="width:96.1%; background:linear-gradient(90deg,#4d8bff,#1040b0)"><span>0.4457</span></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-lbl">(64,) lr=0.0001</div>
+      <div class="bar-track"><div class="bar-fill" style="width:95.2%; background:linear-gradient(90deg,#a87eff,#5b3cc9)"><span>0.4414</span></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-lbl">(16,) lr=0.001</div>
+      <div class="bar-track"><div class="bar-fill" style="width:94.4%; background:linear-gradient(90deg,#00e0b0,#007d66)"><span>0.4380</span></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-lbl">(64,64) lr=0.0001</div>
+      <div class="bar-track"><div class="bar-fill" style="width:93.2%; background:linear-gradient(90deg,#00e0b0,#007d66)"><span>0.4321</span></div></div>
+    </div>
+  </div>
+
+  <div class="info-box purple">
+    📌 <strong>Observação:</strong> A arquitetura mais simples com 2 camadas de 16 neurônios superou configurações maiores e mais profundas.
+    Isso sugere que, para este conjunto de dados com 15 features categóricas binárias, a capacidade extra de redes maiores
+    não traz ganhos significativos — e pode até causar overfitting sutil.
   </div>
 </div>
 
-<!-- RESULTADOS FINAIS -->
+<!-- ══════════════════════════════════════════════ RESULTADOS -->
 <div class="page" id="resultados">
+
+  <div class="result-highlight">
+    <div class="trophy">🏆</div>
+    <div class="result-highlight-body">
+      <h3>Modelo Vencedor: Arquitetura (16, 16) &mdash; LR = 0.001</h3>
+      <p>
+        Melhor F1-Score entre os 27 experimentos (0.4639) antes do ajuste de threshold.
+        Após ajuste, o recall da classe de óbito saltou de <strong style="color:var(--warn)">40.33%</strong>
+        para <strong style="color:var(--gold)">73.55%</strong>.
+      </p>
+    </div>
+  </div>
+
   <div class="cards">
-    <div class="card green"><div class="card-value">91.55%</div><div class="card-label">Acurácia Final</div></div>
-    <div class="card gold"><div class="card-value">0.5576</div><div class="card-label">F1-Score Final</div></div>
-    <div class="card orange"><div class="card-value">73.55%</div><div class="card-label">Recall Classe 1 (Óbito)</div></div>
-    <div class="card"><div class="card-value">44.90%</div><div class="card-label">Precisão Classe 1</div></div>
+    <div class="card green"><span class="card-icon">✅</span><div class="card-value">91.55%</div><div class="card-label">Acurácia Final</div></div>
+    <div class="card gold"><span class="card-icon">⚖️</span><div class="card-value">0.5576</div><div class="card-label">F1-Score Final</div></div>
+    <div class="card orange"><span class="card-icon">🔍</span><div class="card-value">73.55%</div><div class="card-label">Recall Classe Óbito</div></div>
+    <div class="card"><span class="card-icon">🎯</span><div class="card-value">44.90%</div><div class="card-label">Precisão Classe Óbito</div></div>
   </div>
 
   <div class="section-title">Impacto do Ajuste de Threshold</div>
   <div class="compare-grid">
     <div class="compare-card">
-      <h4>⚙️ Sem Ajuste — threshold = 0.5 (padrão)</h4>
+      <h4>⚙️ Sem Ajuste &mdash; threshold = 0.5 (padrão)</h4>
       <div class="gauge-row">
         <div class="gauge-label">Acurácia</div>
         <div class="gauge-bar"><div class="gauge-fill" style="width:93.25%; background:var(--accent)"></div></div>
@@ -529,11 +1122,12 @@
       <div class="gauge-row">
         <div class="gauge-label">Precisão cls.1</div>
         <div class="gauge-bar"><div class="gauge-fill" style="width:54.6%; background:var(--muted)"></div></div>
-        <div class="gauge-val" style="color:var(--muted)">54.58%</div>
+        <div class="gauge-val" style="color:var(--muted2)">54.58%</div>
       </div>
     </div>
-    <div class="compare-card" style="border-color: rgba(0,212,170,0.3);">
-      <h4>🎯 Com Ajuste de Threshold — recall ↑↑</h4>
+
+    <div class="compare-card highlight">
+      <h4>🎯 Com Ajuste de Threshold &mdash; recall ↑↑</h4>
       <div class="gauge-row">
         <div class="gauge-label">Acurácia</div>
         <div class="gauge-bar"><div class="gauge-fill" style="width:91.55%; background:var(--accent)"></div></div>
@@ -557,34 +1151,53 @@
     </div>
   </div>
 
-  <div class="section-title">Matriz de Confusão — Modelo Final</div>
-  <div class="matrix-wrap">
-    <div class="matrix-inner">
-      <div class="matrix-col-labels">
-        <span>Pred. 0<br>(Sobreviveu)</span>
-        <span>Pred. 1<br>(Óbito)</span>
+  <div class="matrix-section">
+    <div class="matrix-title">Matriz de Confusão — Modelo Final (20.000 amostras de teste)</div>
+    <div class="matrix-grid">
+      <div class="matrix-corner"></div>
+      <div class="matrix-col-h">Predito 0<br><span style="color:var(--accent2)">Sobreviveu</span></div>
+      <div class="matrix-col-h">Predito 1<br><span style="color:var(--warn)">Óbito</span></div>
+
+      <div class="matrix-row-h">Real 0<br>Sobreviveu</div>
+      <div class="m-cell cell-tn">
+        <div class="big">16.962</div>
+        <div class="pct">84.8%</div>
+        <div class="lbl">Verdadeiro Neg.</div>
       </div>
-      <div class="matrix-row">
-        <div class="matrix-row-label">Real 0</div>
-        <div class="m-cell cell-tn"><div class="big">16.962</div><div class="small">Verdadeiro Neg.</div></div>
-        <div class="m-cell cell-fp"><div class="big">529</div><div class="small">Falso Positivo</div></div>
+      <div class="m-cell cell-fp">
+        <div class="big">529</div>
+        <div class="pct">2.6%</div>
+        <div class="lbl">Falso Positivo</div>
       </div>
-      <div class="matrix-row">
-        <div class="matrix-row-label">Real 1</div>
-        <div class="m-cell cell-fn"><div class="big">380</div><div class="small">Falso Negativo</div></div>
-        <div class="m-cell cell-tp"><div class="big">1.129</div><div class="small">Verdadeiro Pos.</div></div>
+
+      <div class="matrix-row-h">Real 1<br>Óbito</div>
+      <div class="m-cell cell-fn">
+        <div class="big">380</div>
+        <div class="pct">1.9%</div>
+        <div class="lbl">Falso Negativo</div>
+      </div>
+      <div class="m-cell cell-tp">
+        <div class="big">1.129</div>
+        <div class="pct">5.6%</div>
+        <div class="lbl">Verdadeiro Pos.</div>
       </div>
     </div>
   </div>
 
   <div class="info-box success">
-    💡 <strong>Conclusão do projeto:</strong> O ajuste do limiar de decisão mostrou-se mais eficaz do que aumentar a complexidade da arquitetura. Ao reduzir o threshold abaixo de 0.5, o recall da classe positiva (óbito) saltou de <strong>~40%</strong> para <strong>~73.5%</strong> — tornando o modelo muito mais adequado para uso clínico, onde falsos negativos (não detectar um óbito real) têm consequências graves.
-  </div>
-
-  <div class="info-box">
-    <strong>Modelo vencedor:</strong> Arquitetura <strong>(16, 16)</strong> com Learning Rate <strong>0.001</strong>, que alcançou o melhor F1-Score (0.4639) entre os 27 experimentos antes do ajuste de threshold.
+    💡 <strong>Conclusão do projeto:</strong> O ajuste do limiar de decisão mostrou-se mais eficaz do que
+    aumentar a complexidade da arquitetura. Ao reduzir o threshold abaixo de 0.5, o recall da classe positiva
+    (óbito) saltou de <strong>~40%</strong> para <strong>~73.5%</strong> — tornando o modelo muito mais adequado
+    para uso clínico, onde falsos negativos (não detectar um óbito real) têm consequências graves.
   </div>
 </div>
+
+<!-- FOOTER -->
+<div class="footer">
+  Trabalho Acadêmico &mdash; Redes Neurais &middot; MLPClassifier &middot; Scikit-learn &middot; 2024
+</div>
+
+</div><!-- /container -->
 
 <script>
   function show(id, el) {
